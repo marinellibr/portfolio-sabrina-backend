@@ -1,13 +1,36 @@
 const mongoose = require('mongoose');
 
-let cached = global._mongooseConnection;
+// Não enfileira operações: falha rápido se não estiver conectado
+mongoose.set('bufferCommands', false);
+
+let cached = global._mongoose;
+if (!cached) {
+  cached = global._mongoose = { conn: null, promise: null };
+}
 
 async function connectDB() {
-  if (cached && mongoose.connection.readyState === 1) return;
+  if (cached.conn && mongoose.connection.readyState === 1) {
+    return cached.conn;
+  }
 
-  cached = global._mongooseConnection = mongoose.connect(process.env.MONGODB_URI);
-  await cached;
-  console.log('MongoDB connected');
+  // Conexão anterior caiu (freeze/thaw do serverless): reseta
+  if (cached.promise && mongoose.connection.readyState !== 1) {
+    cached.promise = null;
+  }
+
+  if (!cached.promise) {
+    cached.promise = mongoose
+      .connect(process.env.MONGODB_URI, {
+        serverSelectionTimeoutMS: 5000,
+      })
+      .then((m) => {
+        console.log('MongoDB connected');
+        return m;
+      });
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
 }
 
 module.exports = connectDB;
