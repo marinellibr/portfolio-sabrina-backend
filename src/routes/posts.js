@@ -18,8 +18,8 @@ router.get('/:id', async (req, res) => {
 
 // POST /posts — cria um novo post
 router.post('/', async (req, res) => {
-  const { title, content, author, tags } = req.body;
-  const post = await Post.create({ title, content, author, tags });
+  const { title, content, author, images, videos, tags } = req.body;
+  const post = await Post.create({ title, content, author, images, videos, tags });
   res.status(201).json(post);
 });
 
