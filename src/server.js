@@ -28,6 +28,8 @@ app.use(
       // A escrita já é protegida por API key, então isso é seguro.
       if (!origin) return callback(null, true);
       const normalized = origin.replace(/\/$/, '');
+      // Permite qualquer porta do localhost para desenvolvimento local
+      if (/^http:\/\/localhost(:\d+)?$/.test(normalized)) return callback(null, true);
       if (allowedOrigins.includes(normalized)) return callback(null, true);
       return callback(new Error('Origin não permitida pelo CORS'));
     },
