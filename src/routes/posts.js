@@ -6,10 +6,20 @@ const validatePost = require('../middleware/validatePost');
 
 const router = Router();
 
-// GET /posts — público, retorna todos os posts
+// GET /posts — público, retorna todos os posts completos
 router.get('/', async (req, res, next) => {
   try {
     const posts = await Post.find().sort({ createdAt: -1 });
+    res.json(posts);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /posts/summary — público, retorna apenas id, title e images
+router.get('/summary', async (req, res, next) => {
+  try {
+    const posts = await Post.find().sort({ createdAt: -1 }).select('title images');
     res.json(posts);
   } catch (err) {
     next(err);
