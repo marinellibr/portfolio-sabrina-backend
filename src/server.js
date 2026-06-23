@@ -17,6 +17,30 @@ app.set('trust proxy', 1);
 // Atribui request-id e registra cada request (sem logar body/credenciais)
 app.use(requestLogger);
 
+// Documentação da API (pública). Montada antes do helmet para que o CSP não
+// bloqueie o carregamento do Swagger UI via CDN, e antes do rate limit/DB para
+// que continue acessível mesmo sob carga ou com o banco indisponível.
+const openapiSpec = require('./openapi');
+app.get('/openapi.json', (req, res) => res.json(openapiSpec));
+app.get('/docs', (req, res) => {
+  res.type('html').send(`<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portfolio Sabrina API — Docs</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+  <script>
+    window.ui = SwaggerUIBundle({ url: '/openapi.json', dom_id: '#swagger-ui' });
+  </script>
+</body>
+</html>`);
+});
+
 // Headers de segurança
 app.use(helmet());
 
