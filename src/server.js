@@ -5,6 +5,7 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const connectDB = require('./db');
 const postsRouter = require('./routes/posts');
+const authRouter = require('./routes/auth');
 
 const app = express();
 
@@ -60,6 +61,7 @@ app.use(async (req, res, next) => {
   }
 });
 
+app.use('/auth', authRouter);
 app.use('/posts', postsRouter);
 
 // Handler de erros centralizado: nunca vaza stack trace

@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const mongoose = require('mongoose');
 const Post = require('../models/Post');
-const requireApiKey = require('../middleware/auth');
+const requireAuth = require('../middleware/requireAuth');
 const validatePost = require('../middleware/validatePost');
 
 const router = Router();
@@ -40,8 +40,8 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-// POST /posts — protegido por API key + validação de input
-router.post('/', requireApiKey, validatePost, async (req, res, next) => {
+// POST /posts — protegido por JWT + validação de input
+router.post('/', requireAuth, validatePost, async (req, res, next) => {
   try {
     const post = await Post.create(req.validatedPost);
     res.status(201).json(post);
