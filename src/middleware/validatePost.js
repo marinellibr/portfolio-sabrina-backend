@@ -1,6 +1,5 @@
 const MAX_TITLE = 200;
 const MAX_CONTENT = 20000;
-const MAX_AUTHOR = 100;
 const MAX_TAG = 50;
 const MAX_ARRAY_ITEMS = 50;
 const MAX_URL = 2000;
@@ -9,7 +8,6 @@ function isString(v) {
   return typeof v === 'string';
 }
 
-// Aceita apenas URLs http(s) bem formadas (bloqueia javascript:, data:, etc.)
 function isSafeHttpUrl(v) {
   if (!isString(v) || v.length > MAX_URL) return false;
   try {
@@ -49,7 +47,7 @@ module.exports = function validatePost(req, res, next) {
   const body = req.body || {};
   const errors = [];
 
-  const { title, content, author } = body;
+  const { title, content } = body;
 
   if (!isString(title) || title.trim().length === 0) {
     errors.push('title é obrigatório');
@@ -63,10 +61,6 @@ module.exports = function validatePost(req, res, next) {
     errors.push(`content excede ${MAX_CONTENT} caracteres`);
   }
 
-  if (author !== undefined && (!isString(author) || author.length > MAX_AUTHOR)) {
-    errors.push('author inválido');
-  }
-
   const images = validateStringArray(body.images, 'images', errors, { urls: true });
   const videos = validateStringArray(body.videos, 'videos', errors, { urls: true });
   const tags = validateStringArray(body.tags, 'tags', errors);
@@ -75,11 +69,9 @@ module.exports = function validatePost(req, res, next) {
     return res.status(400).json({ message: 'Dados inválidos', errors });
   }
 
-  // Só os campos validados seguem adiante.
   req.validatedPost = {
     title: title.trim(),
     content: content.trim(),
-    author: author ? author.trim() : undefined,
     images,
     videos,
     tags,

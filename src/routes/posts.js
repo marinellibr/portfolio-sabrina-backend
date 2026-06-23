@@ -50,4 +50,35 @@ router.post('/', requireAuth, validatePost, async (req, res, next) => {
   }
 });
 
+// PUT /posts/:id — protegido por JWT + validação de input
+router.put('/:id', requireAuth, validatePost, async (req, res, next) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: 'ID inválido' });
+    }
+    const post = await Post.findByIdAndUpdate(req.params.id, req.validatedPost, {
+      new: true,
+      runValidators: true,
+    });
+    if (!post) return res.status(404).json({ message: 'Post não encontrado' });
+    res.json(post);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /posts/:id — protegido por JWT
+router.delete('/:id', requireAuth, async (req, res, next) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: 'ID inválido' });
+    }
+    const post = await Post.findByIdAndDelete(req.params.id);
+    if (!post) return res.status(404).json({ message: 'Post não encontrado' });
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;

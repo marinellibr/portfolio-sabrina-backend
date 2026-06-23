@@ -64,13 +64,13 @@ app.use(async (req, res, next) => {
 app.use('/auth', authRouter);
 app.use('/posts', postsRouter);
 
-// Handler de erros centralizado: nunca vaza stack trace
+// Handler de erros centralizado: loga apenas método/rota/status, nunca body ou dados pessoais
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   if (err && err.message === 'Origin não permitida pelo CORS') {
     return res.status(403).json({ message: 'Origin não permitida' });
   }
-  console.error(err);
+  console.error(`[${req.method}] ${req.path} →`, err.message);
   res.status(500).json({ message: 'Erro interno do servidor' });
 });
 
