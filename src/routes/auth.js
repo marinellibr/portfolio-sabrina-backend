@@ -8,7 +8,7 @@ const router = Router();
 // Rate limit estrito no login para dificultar brute-force de senha.
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
-  max: 10,
+  max: 5,
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: 'Muitas tentativas de login, tente novamente mais tarde' },
