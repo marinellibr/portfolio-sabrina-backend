@@ -6,11 +6,16 @@ const rateLimit = require('express-rate-limit');
 const connectDB = require('./db');
 const postsRouter = require('./routes/posts');
 const authRouter = require('./routes/auth');
+const logger = require('./logger');
+const requestLogger = require('./middleware/requestLogger');
 
 const app = express();
 
 // Confia no proxy da Vercel para obter o IP real (necessário p/ rate limit)
 app.set('trust proxy', 1);
+
+// Atribui request-id e registra cada request (sem logar body/credenciais)
+app.use(requestLogger);
 
 // Headers de segurança
 app.use(helmet());
@@ -70,13 +75,16 @@ app.use((err, req, res, next) => {
   if (err && err.message === 'Origin não permitida pelo CORS') {
     return res.status(403).json({ message: 'Origin não permitida' });
   }
-  console.error(`[${req.method}] ${req.path} →`, err.message);
+  (req.log || logger).error(
+    { method: req.method, path: req.path, err: err.message },
+    'request error'
+  );
   res.status(500).json({ message: 'Erro interno do servidor' });
 });
 
 if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  app.listen(PORT, () => logger.info({ port: PORT }, 'server running'));
 }
 
 module.exports = app;

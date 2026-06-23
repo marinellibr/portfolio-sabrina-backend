@@ -36,6 +36,8 @@ router.post('/login', loginLimiter, async (req, res, next) => {
 
     // Mensagem genérica: não revela se foi o username ou a senha que errou.
     if (!usernameOk || !passwordOk) {
+      // Loga apenas o resultado (sem credenciais) para auditoria de brute-force.
+      if (req.log) req.log.warn({ event: 'login_failed' }, 'login failed');
       return res.status(401).json({ message: 'Credenciais inválidas' });
     }
 
@@ -43,6 +45,7 @@ router.post('/login', loginLimiter, async (req, res, next) => {
       expiresIn: '7d',
     });
 
+    if (req.log) req.log.info({ event: 'login_success' }, 'login success');
     res.json({ token, expiresIn: '7d' });
   } catch (err) {
     next(err);
