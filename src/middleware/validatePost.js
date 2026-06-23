@@ -8,14 +8,31 @@ function isString(v) {
   return typeof v === 'string';
 }
 
-function isSafeHttpUrl(v) {
-  if (!isString(v) || v.length > MAX_URL) return false;
+// Valida o formato de uma URL de mídia. Além de exigir http/https, garante
+// que a URL tenha um hostname real e não embuta credenciais (user:pass@host),
+// que poderiam vazar ou indicar um payload malicioso. A validação é de formato
+// (não faz requisição de rede), para não introduzir latência/flakiness em
+// ambiente serverless.
+function urlError(v) {
+  if (!isString(v)) return 'não é uma string';
+  if (v.length > MAX_URL) return `excede ${MAX_URL} caracteres`;
+  if (/\s/.test(v)) return 'contém espaços';
+  let url;
   try {
-    const url = new URL(v);
-    return url.protocol === 'http:' || url.protocol === 'https:';
+    url = new URL(v);
   } catch {
-    return false;
+    return 'não é uma URL válida';
   }
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    return 'usa um protocolo não permitido (apenas http/https)';
+  }
+  if (!url.hostname || !url.hostname.includes('.')) {
+    return 'não possui um host válido';
+  }
+  if (url.username || url.password) {
+    return 'não pode conter credenciais embutidas';
+  }
+  return null;
 }
 
 function validateStringArray(value, label, errors, { urls = false } = {}) {
@@ -28,17 +45,16 @@ function validateStringArray(value, label, errors, { urls = false } = {}) {
     errors.push(`${label} excede o máximo de ${MAX_ARRAY_ITEMS} itens`);
     return [];
   }
-  for (const item of value) {
+  value.forEach((item, index) => {
     if (urls) {
-      if (!isSafeHttpUrl(item)) {
-        errors.push(`${label} contém uma URL inválida (apenas http/https são permitidos)`);
-        break;
+      const err = urlError(item);
+      if (err) {
+        errors.push(`${label}[${index}] é inválido: ${err}`);
       }
     } else if (!isString(item) || item.length > MAX_TAG) {
-      errors.push(`${label} contém um valor inválido`);
-      break;
+      errors.push(`${label}[${index}] é inválido`);
     }
-  }
+  });
   return value;
 }
 
