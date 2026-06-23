@@ -66,6 +66,12 @@ app.use(async (req, res, next) => {
   }
 });
 
+// Rotas versionadas (atuais)
+app.use('/v1/auth', authRouter);
+app.use('/v1/posts', postsRouter);
+
+// Rotas legadas (sem versão) — mantidas temporariamente para não quebrar
+// clientes já publicados enquanto migram para /v1. Serão removidas no futuro.
 app.use('/auth', authRouter);
 app.use('/posts', postsRouter);
 
