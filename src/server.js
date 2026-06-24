@@ -6,11 +6,40 @@ const rateLimit = require('express-rate-limit');
 const connectDB = require('./db');
 const postsRouter = require('./routes/posts');
 const authRouter = require('./routes/auth');
+const logger = require('./logger');
+const requestLogger = require('./middleware/requestLogger');
 
 const app = express();
 
 // Confia no proxy da Vercel para obter o IP real (necessário p/ rate limit)
 app.set('trust proxy', 1);
+
+// Atribui request-id e registra cada request (sem logar body/credenciais)
+app.use(requestLogger);
+
+// Documentação da API (pública). Montada antes do helmet para que o CSP não
+// bloqueie o carregamento do Swagger UI via CDN, e antes do rate limit/DB para
+// que continue acessível mesmo sob carga ou com o banco indisponível.
+const openapiSpec = require('./openapi');
+app.get('/openapi.json', (req, res) => res.json(openapiSpec));
+app.get('/docs', (req, res) => {
+  res.type('html').send(`<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portfolio Sabrina API — Docs</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+  <script>
+    window.ui = SwaggerUIBundle({ url: '/openapi.json', dom_id: '#swagger-ui' });
+  </script>
+</body>
+</html>`);
+});
 
 // Headers de segurança
 app.use(helmet());
@@ -61,6 +90,12 @@ app.use(async (req, res, next) => {
   }
 });
 
+// Rotas versionadas (atuais)
+app.use('/v1/auth', authRouter);
+app.use('/v1/posts', postsRouter);
+
+// Rotas legadas (sem versão) — mantidas temporariamente para não quebrar
+// clientes já publicados enquanto migram para /v1. Serão removidas no futuro.
 app.use('/auth', authRouter);
 app.use('/posts', postsRouter);
 
@@ -70,13 +105,16 @@ app.use((err, req, res, next) => {
   if (err && err.message === 'Origin não permitida pelo CORS') {
     return res.status(403).json({ message: 'Origin não permitida' });
   }
-  console.error(`[${req.method}] ${req.path} →`, err.message);
+  (req.log || logger).error(
+    { method: req.method, path: req.path, err: err.message },
+    'request error'
+  );
   res.status(500).json({ message: 'Erro interno do servidor' });
 });
 
 if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  app.listen(PORT, () => logger.info({ port: PORT }, 'server running'));
 }
 
 module.exports = app;
