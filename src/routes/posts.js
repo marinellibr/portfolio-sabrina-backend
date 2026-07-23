@@ -16,10 +16,12 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// GET /posts/summary — público, retorna apenas id, title e images
+// GET /posts/summary — público, retorna dados essenciais para listagem
 router.get('/summary', async (req, res, next) => {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 }).select('title images');
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .select('cover-image title categories year projectType images');
     res.json(posts);
   } catch (err) {
     next(err);

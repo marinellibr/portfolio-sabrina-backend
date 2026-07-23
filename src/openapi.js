@@ -4,11 +4,30 @@ const postSchema = {
   type: 'object',
   properties: {
     _id: { type: 'string', example: '665f1b2c3d4e5f6a7b8c9d0e' },
+    'cover-image': { type: 'string', format: 'uri' },
     title: { type: 'string', maxLength: 200 },
     content: { type: 'string', maxLength: 20000 },
-    images: { type: 'array', items: { type: 'string', format: 'uri' } },
-    videos: { type: 'array', items: { type: 'string', format: 'uri' } },
-    tags: { type: 'array', items: { type: 'string', maxLength: 50 } },
+    button: {
+      type: 'object',
+      properties: {
+        label: { type: 'string', maxLength: 120 },
+        link: { type: 'string', format: 'uri' },
+      },
+    },
+    categories: { type: 'array', items: { type: 'string', maxLength: 120 } },
+    year: { type: 'string', maxLength: 20 },
+    projectType: { type: 'array', items: { type: 'string', maxLength: 120 } },
+    images: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          url: { type: 'string', format: 'uri' },
+          cover: { type: 'boolean' },
+        },
+      },
+    },
+    video: { type: 'string', format: 'uri' },
     createdAt: { type: 'string', format: 'date-time' },
     updatedAt: { type: 'string', format: 'date-time' },
   },
@@ -16,13 +35,35 @@ const postSchema = {
 
 const postInput = {
   type: 'object',
-  required: ['title', 'content'],
+  required: ['cover-image', 'title', 'content', 'button', 'year'],
   properties: {
+    'cover-image': { type: 'string', format: 'uri', maxLength: 2000 },
     title: { type: 'string', maxLength: 200 },
     content: { type: 'string', maxLength: 20000 },
-    images: { type: 'array', maxItems: 50, items: { type: 'string', format: 'uri' } },
-    videos: { type: 'array', maxItems: 50, items: { type: 'string', format: 'uri' } },
-    tags: { type: 'array', maxItems: 50, items: { type: 'string', maxLength: 50 } },
+    button: {
+      type: 'object',
+      required: ['label', 'link'],
+      properties: {
+        label: { type: 'string', maxLength: 120 },
+        link: { type: 'string', format: 'uri', maxLength: 2000 },
+      },
+    },
+    categories: { type: 'array', maxItems: 50, items: { type: 'string', maxLength: 120 } },
+    year: { type: 'string', maxLength: 20 },
+    projectType: { type: 'array', maxItems: 50, items: { type: 'string', maxLength: 120 } },
+    images: {
+      type: 'array',
+      maxItems: 50,
+      items: {
+        type: 'object',
+        required: ['url', 'cover'],
+        properties: {
+          url: { type: 'string', format: 'uri', maxLength: 2000 },
+          cover: { type: 'boolean' },
+        },
+      },
+    },
+    video: { type: 'string', format: 'uri', maxLength: 2000 },
   },
 };
 
@@ -127,7 +168,7 @@ module.exports = {
     },
     '/posts/summary': {
       get: {
-        summary: 'Lista resumida (id, title, images)',
+        summary: 'Lista resumida para listagem',
         tags: ['posts'],
         responses: { 200: { description: 'Lista resumida' } },
       },
