@@ -4,7 +4,7 @@ const postSchema = {
   type: 'object',
   properties: {
     _id: { type: 'string', example: '665f1b2c3d4e5f6a7b8c9d0e' },
-    'cover-image': { type: 'string', format: 'uri' },
+    coverImage: { type: 'string', format: 'uri' },
     title: { type: 'string', maxLength: 200 },
     content: { type: 'string', maxLength: 20000 },
     button: {
@@ -35,9 +35,9 @@ const postSchema = {
 
 const postInput = {
   type: 'object',
-  required: ['cover-image', 'title', 'content', 'button', 'year'],
+  required: ['coverImage', 'title', 'content', 'button', 'year'],
   properties: {
-    'cover-image': { type: 'string', format: 'uri', maxLength: 2000 },
+    coverImage: { type: 'string', format: 'uri', maxLength: 2000 },
     title: { type: 'string', maxLength: 200 },
     content: { type: 'string', maxLength: 20000 },
     button: {

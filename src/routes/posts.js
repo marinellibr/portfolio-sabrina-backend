@@ -21,7 +21,7 @@ router.get('/summary', async (req, res, next) => {
   try {
     const posts = await Post.find()
       .sort({ createdAt: -1 })
-      .select('cover-image title categories year projectType images');
+      .select('coverImage title categories year projectType images');
     res.json(posts);
   } catch (err) {
     next(err);

@@ -139,7 +139,7 @@ module.exports = function validatePost(req, res, next) {
 
   const { title, content, year } = body;
 
-  const coverImage = validateRequiredUrl(body['cover-image'], 'cover-image', errors);
+  const coverImage = validateRequiredUrl(body.coverImage, 'coverImage', errors);
 
   if (!isString(title) || title.trim().length === 0) {
     errors.push('title é obrigatório');
@@ -170,7 +170,7 @@ module.exports = function validatePost(req, res, next) {
   }
 
   req.validatedPost = {
-    'cover-image': coverImage,
+    coverImage,
     title: title.trim(),
     content: content.trim(),
     button,
