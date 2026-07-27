@@ -9,12 +9,12 @@ const postSchema = new mongoose.Schema(
     descriptionEn: { type: String, required: true },
     content: { type: String, default: '' },
     button: {
-      label: { type: String, required: true },
-      link: { type: String, required: true },
+      label: { type: String, default: '' },
+      link: { type: String, default: '' },
     },
     buttonEn: {
-      label: { type: String, required: true },
-      link: { type: String, required: true },
+      label: { type: String, default: '' },
+      link: { type: String, default: '' },
     },
     categories: [String],
     categoriesEn: [String],

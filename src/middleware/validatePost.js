@@ -78,20 +78,34 @@ function validateRequiredUrl(value, label, errors) {
 }
 
 function validateButton(value, errors) {
+  if (value === undefined || value === null || value === '') {
+    return { label: '', link: '' };
+  }
+
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     errors.push('button deve ser um objeto com label e link');
     return { label: '', link: '' };
   }
 
   const { label, link } = value;
+  const hasLabel = isString(label) && label.trim().length > 0;
+  const hasLink = isString(link) && link.trim().length > 0;
 
-  if (!isString(label) || label.trim().length === 0 || label.length > MAX_LABEL) {
-    errors.push(`button.label é obrigatório e deve ter até ${MAX_LABEL} caracteres`);
+  if (!hasLabel && !hasLink) {
+    return { label: '', link: '' };
   }
 
-  const linkError = urlError(link);
-  if (linkError) {
-    errors.push(`button.link é inválido: ${linkError}`);
+  if (!hasLabel || label.length > MAX_LABEL) {
+    errors.push(`button.label deve ser preenchido e ter até ${MAX_LABEL} caracteres quando button for informado`);
+  }
+
+  if (!hasLink) {
+    errors.push('button.link deve ser preenchido quando button for informado');
+  } else {
+    const linkError = urlError(link);
+    if (linkError) {
+      errors.push(`button.link é inválido: ${linkError}`);
+    }
   }
 
   return {

@@ -47,7 +47,7 @@ const postSchema = {
 
 const postInput = {
   type: 'object',
-  required: ['coverImage', 'title', 'titleEn', 'description', 'descriptionEn', 'button', 'buttonEn', 'year'],
+  required: ['coverImage', 'title', 'titleEn', 'description', 'descriptionEn', 'year'],
   properties: {
     coverImage: { type: 'string', format: 'uri', maxLength: 2000 },
     title: { type: 'string', maxLength: 200 },
@@ -57,7 +57,6 @@ const postInput = {
     content: { type: 'string', maxLength: 20000, deprecated: true },
     button: {
       type: 'object',
-      required: ['label', 'link'],
       properties: {
         label: { type: 'string', maxLength: 120 },
         link: { type: 'string', format: 'uri', maxLength: 2000 },
@@ -65,7 +64,6 @@ const postInput = {
     },
     buttonEn: {
       type: 'object',
-      required: ['label', 'link'],
       properties: {
         label: { type: 'string', maxLength: 120 },
         link: { type: 'string', format: 'uri', maxLength: 2000 },
