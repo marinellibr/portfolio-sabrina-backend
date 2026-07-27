@@ -4,14 +4,23 @@ const postSchema = new mongoose.Schema(
   {
     coverImage: { type: String, required: true },
     title: { type: String, required: true },
-    content: { type: String, required: true },
+    titleEn: { type: String, required: true },
+    description: { type: String, required: true },
+    descriptionEn: { type: String, required: true },
+    content: { type: String, default: '' },
     button: {
       label: { type: String, required: true },
       link: { type: String, required: true },
     },
+    buttonEn: {
+      label: { type: String, required: true },
+      link: { type: String, required: true },
+    },
     categories: [String],
+    categoriesEn: [String],
     year: { type: String, required: true },
     projectType: [String],
+    projectTypeEn: [String],
     images: [
       {
         _id: false,

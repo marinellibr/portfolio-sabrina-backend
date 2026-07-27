@@ -6,7 +6,10 @@ const postSchema = {
     _id: { type: 'string', example: '665f1b2c3d4e5f6a7b8c9d0e' },
     coverImage: { type: 'string', format: 'uri' },
     title: { type: 'string', maxLength: 200 },
-    content: { type: 'string', maxLength: 20000 },
+    titleEn: { type: 'string', maxLength: 200 },
+    description: { type: 'string', maxLength: 20000 },
+    descriptionEn: { type: 'string', maxLength: 20000 },
+    content: { type: 'string', maxLength: 20000, deprecated: true },
     button: {
       type: 'object',
       properties: {
@@ -14,9 +17,18 @@ const postSchema = {
         link: { type: 'string', format: 'uri' },
       },
     },
+    buttonEn: {
+      type: 'object',
+      properties: {
+        label: { type: 'string', maxLength: 120 },
+        link: { type: 'string', format: 'uri' },
+      },
+    },
     categories: { type: 'array', items: { type: 'string', maxLength: 120 } },
+    categoriesEn: { type: 'array', items: { type: 'string', maxLength: 120 } },
     year: { type: 'string', maxLength: 20 },
     projectType: { type: 'array', items: { type: 'string', maxLength: 120 } },
+    projectTypeEn: { type: 'array', items: { type: 'string', maxLength: 120 } },
     images: {
       type: 'array',
       items: {
@@ -35,11 +47,14 @@ const postSchema = {
 
 const postInput = {
   type: 'object',
-  required: ['coverImage', 'title', 'content', 'button', 'year'],
+  required: ['coverImage', 'title', 'titleEn', 'description', 'descriptionEn', 'button', 'buttonEn', 'year'],
   properties: {
     coverImage: { type: 'string', format: 'uri', maxLength: 2000 },
     title: { type: 'string', maxLength: 200 },
-    content: { type: 'string', maxLength: 20000 },
+    titleEn: { type: 'string', maxLength: 200 },
+    description: { type: 'string', maxLength: 20000 },
+    descriptionEn: { type: 'string', maxLength: 20000 },
+    content: { type: 'string', maxLength: 20000, deprecated: true },
     button: {
       type: 'object',
       required: ['label', 'link'],
@@ -48,9 +63,19 @@ const postInput = {
         link: { type: 'string', format: 'uri', maxLength: 2000 },
       },
     },
+    buttonEn: {
+      type: 'object',
+      required: ['label', 'link'],
+      properties: {
+        label: { type: 'string', maxLength: 120 },
+        link: { type: 'string', format: 'uri', maxLength: 2000 },
+      },
+    },
     categories: { type: 'array', maxItems: 50, items: { type: 'string', maxLength: 120 } },
+    categoriesEn: { type: 'array', maxItems: 50, items: { type: 'string', maxLength: 120 } },
     year: { type: 'string', maxLength: 20 },
     projectType: { type: 'array', maxItems: 50, items: { type: 'string', maxLength: 120 } },
+    projectTypeEn: { type: 'array', maxItems: 50, items: { type: 'string', maxLength: 120 } },
     images: {
       type: 'array',
       maxItems: 50,

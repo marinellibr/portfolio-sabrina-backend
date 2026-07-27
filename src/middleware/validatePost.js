@@ -137,7 +137,8 @@ module.exports = function validatePost(req, res, next) {
   const body = req.body || {};
   const errors = [];
 
-  const { title, content, year } = body;
+  const { title, titleEn, description, descriptionEn, content, year } = body;
+  const descriptionValue = description ?? content;
 
   const coverImage = validateRequiredUrl(body.coverImage, 'coverImage', errors);
 
@@ -147,15 +148,30 @@ module.exports = function validatePost(req, res, next) {
     errors.push(`title excede ${MAX_TITLE} caracteres`);
   }
 
-  if (!isString(content) || content.trim().length === 0) {
-    errors.push('content é obrigatório');
-  } else if (content.length > MAX_CONTENT) {
-    errors.push(`content excede ${MAX_CONTENT} caracteres`);
+  if (!isString(titleEn) || titleEn.trim().length === 0) {
+    errors.push('titleEn é obrigatório');
+  } else if (titleEn.length > MAX_TITLE) {
+    errors.push(`titleEn excede ${MAX_TITLE} caracteres`);
+  }
+
+  if (!isString(descriptionValue) || descriptionValue.trim().length === 0) {
+    errors.push('description é obrigatório');
+  } else if (descriptionValue.length > MAX_CONTENT) {
+    errors.push(`description excede ${MAX_CONTENT} caracteres`);
+  }
+
+  if (!isString(descriptionEn) || descriptionEn.trim().length === 0) {
+    errors.push('descriptionEn é obrigatório');
+  } else if (descriptionEn.length > MAX_CONTENT) {
+    errors.push(`descriptionEn excede ${MAX_CONTENT} caracteres`);
   }
 
   const button = validateButton(body.button, errors);
+  const buttonEn = validateButton(body.buttonEn, errors);
   const categories = validateStringArray(body.categories, 'categories', errors);
+  const categoriesEn = validateStringArray(body.categoriesEn, 'categoriesEn', errors);
   const projectType = validateStringArray(body.projectType, 'projectType', errors);
+  const projectTypeEn = validateStringArray(body.projectTypeEn, 'projectTypeEn', errors);
   const images = validateImages(body.images, errors);
   const video = validateOptionalUrl(body.video, 'video', errors);
 
@@ -172,11 +188,17 @@ module.exports = function validatePost(req, res, next) {
   req.validatedPost = {
     coverImage,
     title: title.trim(),
-    content: content.trim(),
+    titleEn: titleEn.trim(),
+    description: descriptionValue.trim(),
+    descriptionEn: descriptionEn.trim(),
+    content: descriptionValue.trim(),
     button,
+    buttonEn,
     categories,
+    categoriesEn,
     year: year.trim(),
     projectType,
+    projectTypeEn,
     images,
     video,
   };
