@@ -45,8 +45,10 @@ app.get('/docs', (req, res) => {
 app.use(helmet());
 
 // CORS: allowlist por env var (ALLOWED_ORIGINS, separados por vírgula).
-// Default = domínio de produção do frontend.
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'https://sabrinacardoso.com')
+// Default = domínios de produção do frontend.
+const allowedOrigins = (
+  process.env.ALLOWED_ORIGINS || 'https://sabrinacardoso.com,https://www.sabrinacardoso.com'
+)
   .split(',')
   .map((o) => o.trim().replace(/\/$/, ''))
   .filter(Boolean);
