@@ -53,16 +53,21 @@ const allowedOrigins = (
   .map((o) => o.trim().replace(/\/$/, ''))
   .filter(Boolean);
 
+const isAllowedOrigin = (origin) => {
+  const normalized = origin.replace(/\/$/, '');
+  if (/^http:\/\/localhost(:\d+)?$/.test(normalized)) return true;
+  if (allowedOrigins.includes(normalized)) return true;
+  return /^https:\/\/(www\.)?sabrinacardoso\.com$/.test(normalized);
+};
+
 app.use(
   cors({
     origin(origin, callback) {
       // Permite ferramentas sem origin (curl, Insomnia, server-to-server).
       // A escrita já é protegida por API key, então isso é seguro.
       if (!origin) return callback(null, true);
-      const normalized = origin.replace(/\/$/, '');
-      // Permite qualquer porta do localhost para desenvolvimento local
-      if (/^http:\/\/localhost(:\d+)?$/.test(normalized)) return callback(null, true);
-      if (allowedOrigins.includes(normalized)) return callback(null, true);
+      if (isAllowedOrigin(origin)) return callback(null, true);
+      logger.warn({ origin }, 'cors origin blocked');
       return callback(new Error('Origin não permitida pelo CORS'));
     },
   })
