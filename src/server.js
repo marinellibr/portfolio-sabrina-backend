@@ -57,7 +57,7 @@ const isAllowedOrigin = (origin) => {
   const normalized = origin.replace(/\/$/, '');
   if (/^http:\/\/localhost(:\d+)?$/.test(normalized)) return true;
   if (allowedOrigins.includes(normalized)) return true;
-  return /^https:\/\/(www\.)?sabrinacardoso\.com$/.test(normalized);
+  return /^https?:\/\/(www\.)?sabrinacardoso\.com$/.test(normalized);
 };
 
 app.use(
