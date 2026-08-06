@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const connectDB = require('./db');
 const postsRouter = require('./routes/posts');
 const authRouter = require('./routes/auth');
+const curriculumRouter = require('./routes/curriculum');
 const logger = require('./logger');
 const requestLogger = require('./middleware/requestLogger');
 
@@ -86,6 +87,10 @@ app.use(
     message: { message: 'Muitas requisições, tente novamente mais tarde' },
   })
 );
+
+// Arquivos públicos que não dependem do banco.
+app.use('/v1/curriculum', curriculumRouter);
+app.use('/curriculum', curriculumRouter);
 
 // Garante conexão antes de qualquer request (necessário em serverless)
 app.use(async (req, res, next) => {
